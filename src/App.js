@@ -169,8 +169,8 @@ function App() {
       <div className="text-center bg-black/80 p-4 rounded-lg space-y-2 my-10">
         <div className="text-2xl font-semibold">{winner}</div>
         <p className="text-sm">
-          PS: 7 points for firework are added to the player with most points
-          automatically
+          FYI: The player with the most points automatically receives 7 firework
+          points 🎆
         </p>
       </div>
 
