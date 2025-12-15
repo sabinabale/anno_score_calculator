@@ -1,23 +1,27 @@
 import "./App.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import ResultForm from "./components/ResultForm";
 import ScoreForm from "./components/ScoreForm";
 
 function App() {
-  const players = [1, 2, 3, 4];
+  const players = useMemo(() => [1, 2, 3, 4], []);
 
-  const fields = [
-    { label: "Cards 3", id: "cards-3", multiplier: 3 },
-    { label: "Cards 5", id: "cards-5", multiplier: 5 },
-    { label: "Cards 8", id: "cards-8", multiplier: 8 },
-    { label: "Expedition cards", id: "expedition" },
-    { label: "Gold (1p per 3)", id: "gold" },
-  ];
+  const fields = useMemo(() => {
+    const baseFields = [
+      { label: "Cards 3", id: "cards-3", multiplier: 3 },
+      { label: "Cards 5", id: "cards-5", multiplier: 5 },
+      { label: "Cards 8", id: "cards-8", multiplier: 8 },
+      { label: "Expedition cards", id: "expedition" },
+      { label: "Gold (1p per 3)", id: "gold" },
+    ];
 
-  // Add objectives 1-5
-  for (let i = 1; i <= 5; i++) {
-    fields.push({ label: `Objective ${i}`, id: `objective-${i}` });
-  }
+    const objectiveFields = [];
+    for (let i = 1; i <= 5; i++) {
+      objectiveFields.push({ label: `Objective ${i}`, id: `objective-${i}` });
+    }
+
+    return [...baseFields, ...objectiveFields];
+  }, []);
 
   // State to store input values and results
   const [inputValues, setInputValues] = useState({});
@@ -27,59 +31,8 @@ function App() {
   const [totals, setTotals] = useState({});
   const [winner, setWinner] = useState(null);
 
-  // Initialize state for player names and input values
-  useEffect(() => {
-    const initialPlayerNames = {};
-    const initialInputValues = {};
-    const initialFireworks = {};
-
-    players.forEach((player) => {
-      initialPlayerNames[`player-name-${player}`] = "";
-      initialFireworks[`fireworks-${player}`] = false;
-
-      fields.forEach((field) => {
-        initialInputValues[`${field.id}-${player}`] = "";
-      });
-    });
-
-    setPlayerNames(initialPlayerNames);
-    setInputValues(initialInputValues);
-    setFireworks(initialFireworks);
-  }, []);
-
-  // Update results whenever input values change
-  useEffect(() => {
-    updateResults();
-  }, [inputValues, playerNames, fireworks]);
-
-  // Handle input changes
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-
-    if (id.startsWith("player-name-")) {
-      setPlayerNames((prev) => ({
-        ...prev,
-        [id]: value,
-      }));
-    } else {
-      setInputValues((prev) => ({
-        ...prev,
-        [id]: value,
-      }));
-    }
-  };
-
-  // Handle fireworks checkbox changes
-  const handleFireworksChange = (e) => {
-    const { id, checked } = e.target;
-    setFireworks((prev) => ({
-      ...prev,
-      [id]: checked,
-    }));
-  };
-
   // Calculate and update results
-  const updateResults = () => {
+  const updateResults = useCallback(() => {
     const newResults = {};
     const newTotals = {};
 
@@ -163,6 +116,57 @@ function App() {
     setResults(newResults);
     setTotals(newTotals);
     setWinner(winnerText);
+  }, [fields, fireworks, inputValues, playerNames, players]);
+
+  // Initialize state for player names and input values
+  useEffect(() => {
+    const initialPlayerNames = {};
+    const initialInputValues = {};
+    const initialFireworks = {};
+
+    players.forEach((player) => {
+      initialPlayerNames[`player-name-${player}`] = "";
+      initialFireworks[`fireworks-${player}`] = false;
+
+      fields.forEach((field) => {
+        initialInputValues[`${field.id}-${player}`] = "";
+      });
+    });
+
+    setPlayerNames(initialPlayerNames);
+    setInputValues(initialInputValues);
+    setFireworks(initialFireworks);
+  }, [fields, players]);
+
+  // Update results whenever input values change
+  useEffect(() => {
+    updateResults();
+  }, [updateResults]);
+
+  // Handle input changes
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+
+    if (id.startsWith("player-name-")) {
+      setPlayerNames((prev) => ({
+        ...prev,
+        [id]: value,
+      }));
+    } else {
+      setInputValues((prev) => ({
+        ...prev,
+        [id]: value,
+      }));
+    }
+  };
+
+  // Handle fireworks checkbox changes
+  const handleFireworksChange = (e) => {
+    const { id, checked } = e.target;
+    setFireworks((prev) => ({
+      ...prev,
+      [id]: checked,
+    }));
   };
 
   return (
