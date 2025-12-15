@@ -43,6 +43,23 @@ export default function ResultForm({ players, fields, results, totals }) {
               </div>
             ))}
 
+            {/* Fireworks row */}
+            <div className="grid-row">
+              {players.map((player) => (
+                <div className="grid-cell" key={`result-fireworks-${player}`}>
+                  <label htmlFor={`result-fireworks-${player}`}>
+                    Fireworks
+                  </label>
+                  <input
+                    type="text"
+                    id={`result-fireworks-${player}`}
+                    value={results[`result-fireworks-${player}`] || ""}
+                    readOnly
+                  />
+                </div>
+              ))}
+            </div>
+
             {/* Total row */}
             <div className="grid-row total-row">
               {players.map((player) => (

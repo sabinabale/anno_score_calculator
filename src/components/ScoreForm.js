@@ -6,6 +6,8 @@ export default function ScoreForm({
   inputValues,
   handleInputChange,
   playerNames,
+  fireworks,
+  handleFireworksChange,
 }) {
   return (
     <div className="form-wrapper">
@@ -49,6 +51,24 @@ export default function ScoreForm({
                 ))}
               </div>
             ))}
+
+            {/* Fireworks checkbox row */}
+            <div className="grid-row">
+              {players.map((player) => (
+                <div className="grid-cell" key={`fireworks-${player}`}>
+                  <label htmlFor={`fireworks-${player}`}>
+                    Fireworks (+7)
+                  </label>
+                  <input
+                    type="checkbox"
+                    id={`fireworks-${player}`}
+                    name={`fireworks-${player}`}
+                    checked={fireworks[`fireworks-${player}`] || false}
+                    onChange={handleFireworksChange}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </form>

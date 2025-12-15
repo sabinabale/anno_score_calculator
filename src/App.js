@@ -22,6 +22,7 @@ function App() {
   // State to store input values and results
   const [inputValues, setInputValues] = useState({});
   const [playerNames, setPlayerNames] = useState({});
+  const [fireworks, setFireworks] = useState({});
   const [results, setResults] = useState({});
   const [totals, setTotals] = useState({});
   const [winner, setWinner] = useState(null);
@@ -30,9 +31,11 @@ function App() {
   useEffect(() => {
     const initialPlayerNames = {};
     const initialInputValues = {};
+    const initialFireworks = {};
 
     players.forEach((player) => {
       initialPlayerNames[`player-name-${player}`] = "";
+      initialFireworks[`fireworks-${player}`] = false;
 
       fields.forEach((field) => {
         initialInputValues[`${field.id}-${player}`] = "";
@@ -41,12 +44,13 @@ function App() {
 
     setPlayerNames(initialPlayerNames);
     setInputValues(initialInputValues);
+    setFireworks(initialFireworks);
   }, []);
 
   // Update results whenever input values change
   useEffect(() => {
     updateResults();
-  }, [inputValues, playerNames]);
+  }, [inputValues, playerNames, fireworks]);
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -63,6 +67,15 @@ function App() {
         [id]: value,
       }));
     }
+  };
+
+  // Handle fireworks checkbox changes
+  const handleFireworksChange = (e) => {
+    const { id, checked } = e.target;
+    setFireworks((prev) => ({
+      ...prev,
+      [id]: checked,
+    }));
   };
 
   // Calculate and update results
@@ -109,6 +122,16 @@ function App() {
       });
     });
 
+    // Add fireworks points (7 points if checked)
+    players.forEach((player) => {
+      const fireworksKey = `fireworks-${player}`;
+      const hasFireworks = fireworks[fireworksKey] || false;
+      newResults[`result-fireworks-${player}`] = hasFireworks ? 7 : "";
+      if (hasFireworks) {
+        newTotals[player] += 7;
+      }
+    });
+
     // Determine the winner
     let maxTotal = -1;
     let winningPlayer = null;
@@ -131,7 +154,7 @@ function App() {
         `Player ${winningPlayer}`;
       winnerText =
         maxTotal > 0
-          ? `🏆 ${winnerName} wins with ${maxTotal + 7} points! 🏆`
+          ? `🏆 ${winnerName} wins with ${maxTotal} points! 🏆`
           : "";
     } else if (isTie && maxTotal > 0) {
       winnerText = `It's a tie with ${maxTotal} points!`;
@@ -156,6 +179,8 @@ function App() {
             inputValues={inputValues}
             handleInputChange={handleInputChange}
             playerNames={playerNames}
+            fireworks={fireworks}
+            handleFireworksChange={handleFireworksChange}
           />
           <ResultForm
             players={players}
@@ -168,10 +193,6 @@ function App() {
 
       <div className="text-center bg-black/80 p-4 rounded-lg space-y-2 my-10">
         <div className="text-2xl font-semibold">{winner}</div>
-        <p className="text-sm">
-          FYI: The player with the most points automatically receives 7 firework
-          points 🎆
-        </p>
       </div>
 
       <footer className="bg-black/80 p-4 rounded-lg  my-10">
